@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jewish History Explorer — the record & the tradition, across 5,000 years</title>
+<meta name="description" content="An interactive globe and a dual-track timeline of Jewish history — the archaeological record beside the tradition — from ancient Mesopotamia to today. Where Jews lived, how they moved, and the events that shaped them. Private, runs in your browser.">
+<link rel="icon" href="assets/icon.png">
+<meta property="og:title" content="Jewish History Explorer">
+<meta property="og:description" content="The record beside the tradition — 5,000 years of Jewish history on an interactive globe + dual-track timeline.">
+<meta property="og:type" content="website">
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font: 16px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #dfe6f2;
+    background: radial-gradient(1200px 820px at 72% -12%, #1b3a5e 0%, #0a1626 46%, #04080f 100%);
+    min-height: 100vh;
+  }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 40px 24px 100px; }
+  .top { display: flex; align-items: center; gap: 12px; margin: 0 0 44px; }
+  .logo { width: 46px; height: 46px; filter: drop-shadow(0 2px 6px rgba(0,0,0,.5)); }
+  .brandname { font-weight: 700; font-size: 17px; color: #eaf1fb; }
+  .eyebrow { letter-spacing: .16em; text-transform: uppercase; font-size: 12px; color: #7da7d9; margin: 0 0 10px; }
+  h1 { font-size: 42px; line-height: 1.12; margin: 0 0 16px; color: #fff; }
+  h1 .gold { color: #e7c46b; }
+  .lede { font-size: 19px; color: #c4d3e8; margin: 0 0 30px; max-width: 64ch; }
+  a { color: #6fb3ff; }
+  .ctas { display: flex; flex-wrap: wrap; gap: 12px; margin: 0 0 8px; align-items: center; }
+  .cta {
+    display: inline-flex; align-items: center; gap: 9px;
+    background: linear-gradient(180deg, #3d8bff, #2f6fe0);
+    color: #fff; text-decoration: none; font-weight: 600;
+    padding: 13px 24px; border-radius: 12px;
+    border: 1px solid rgba(255,255,255,.16);
+    box-shadow: 0 6px 24px rgba(47,111,224,.35);
+  }
+  .cta:hover { background: linear-gradient(180deg, #57a0ff, #3d8bff); }
+  .cta-ghost { background: rgba(255,255,255,.06); box-shadow: none; color: #cfe0f7; }
+  .cta-ghost:hover { background: rgba(255,255,255,.1); }
+  .note { color: #8aa0bd; font-size: 14px; margin: 14px 0 0; }
+  .hero { width: 100%; border-radius: 16px; margin: 38px 0 8px; border: 1px solid rgba(255,255,255,.1); box-shadow: 0 20px 60px rgba(0,0,0,.5); display: block; background: #0a1626; }
+  .herocap { color: #8aa0bd; font-size: 13px; text-align: center; margin: 10px 0 0; }
+  h2 { font-size: 22px; margin: 56px 0 16px; color: #fff; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; }
+  .card { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); border-radius: 14px; padding: 20px 22px; }
+  .card h3 { margin: 0 0 8px; font-size: 16px; color: #cfe2ff; display: flex; align-items: center; gap: 8px; }
+  .card p { margin: 0; color: #b8c6da; font-size: 15px; }
+  .sw { width: 11px; height: 11px; border-radius: 3px; flex: none; }
+  .data { color: #b3c2d8; font-size: 15px; max-width: 72ch; }
+  .privacy { margin-top: 28px; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); border-radius: 14px; padding: 22px 24px; }
+  .privacy strong { color: #fff; }
+  footer { margin-top: 56px; padding-top: 22px; border-top: 1px solid rgba(255,255,255,.08); color: #8aa0bd; font-size: 14px; }
+  footer a { color: #9cc5ff; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <img class="logo" src="assets/logo.svg" alt="">
+    <span class="brandname">Jewish History Explorer</span>
+  </header>
+
+  <p class="eyebrow">Interactive globe &amp; timeline</p>
+  <h1>Where the Jewish people lived &amp; moved — <span class="gold">the record &amp; the tradition</span>, across 5,000 years</h1>
+  <p class="lede">An interactive globe and a dual-track timeline that run Jewish history along two rails — the
+  archaeological <b>record</b> beside the <b>tradition</b> — from ancient Mesopotamia to today. See where
+  Jews lived and how many, trace the great migrations and their causes, and open any event to find what the
+  evidence shows and what scripture recounts, side by side.</p>
+
+  <div class="ctas">
+    <a class="cta" href="app/jewishhistory.html">Launch the explorer →</a>
+    <span class="cta cta-ghost">Chrome extension — coming soon</span>
+  </div>
+  <p class="note">Private by default · no accounts · collects no data · runs entirely in your browser</p>
+
+  <!-- dual-track hero -->
+  <svg class="hero" viewBox="0 0 900 300" role="img" aria-label="A dual-track timeline: the record on top, the tradition below, linked where they corroborate.">
+    <rect width="900" height="300" rx="16" fill="#0a1626"/>
+    <text x="40" y="42" fill="#9fb4d6" font-size="13" letter-spacing="2" style="text-transform:uppercase">From ~3000 BCE to today</text>
+    <rect x="40" y="74" width="820" height="40" rx="10" fill="rgba(90,160,239,.10)"/>
+    <rect x="40" y="190" width="820" height="40" rx="10" fill="rgba(216,163,46,.12)"/>
+    <text x="40" y="70" fill="#5aa0ef" font-size="13" font-weight="600">The record</text>
+    <text x="40" y="186" fill="#d8a32e" font-size="13" font-weight="600">Tradition</text>
+    <line x1="40" y1="152" x2="860" y2="152" stroke="rgba(255,255,255,.14)"/>
+    <!-- corroboration bridges -->
+    <line x1="250" y1="100" x2="250" y2="204" stroke="#1aa179" stroke-width="4" stroke-linecap="round" opacity=".85"/>
+    <line x1="470" y1="100" x2="470" y2="204" stroke="#e0962f" stroke-width="4" stroke-linecap="round" opacity=".85"/>
+    <line x1="560" y1="100" x2="560" y2="204" stroke="#1aa179" stroke-width="4" stroke-linecap="round" opacity=".85"/>
+    <!-- record dots -->
+    <g fill="#5aa0ef" stroke="rgba(8,12,24,.4)">
+      <circle cx="180" cy="94" r="7"/><circle cx="250" cy="94" r="7"/><circle cx="330" cy="94" r="7"/>
+      <circle cx="470" cy="94" r="7"/><circle cx="560" cy="94" r="7"/><circle cx="650" cy="94" r="7"/>
+      <circle cx="720" cy="94" r="7"/><circle cx="800" cy="94" r="7"/>
+    </g>
+    <!-- tradition dots -->
+    <g fill="#d8a32e" stroke="rgba(8,12,24,.4)">
+      <circle cx="110" cy="210" r="7"/><circle cx="250" cy="210" r="7"/><circle cx="380" cy="210" r="7"/>
+      <circle cx="470" cy="210" r="7"/><circle cx="560" cy="210" r="7"/>
+    </g>
+    <text x="250" y="58" fill="#dfe6f2" font-size="12" text-anchor="middle">Babylonian exile</text>
+    <text x="110" y="254" fill="#c9d4e6" font-size="12" text-anchor="middle">Exodus</text>
+    <text x="800" y="58" fill="#dfe6f2" font-size="12" text-anchor="middle">Israel 1948</text>
+    <!-- legend -->
+    <g font-size="12" fill="#9fb4d6">
+      <rect x="560" y="262" width="12" height="6" rx="3" fill="#1aa179"/><text x="578" y="268">corroborated</text>
+      <rect x="690" y="262" width="12" height="6" rx="3" fill="#e0962f"/><text x="708" y="268">partly</text>
+    </g>
+  </svg>
+  <p class="herocap">The signature view: every event sits on the record lane, the tradition lane, or both — linked where they agree.</p>
+
+  <h2>What it does</h2>
+  <div class="grid">
+    <div class="card"><h3><span class="sw" style="background:#5aa0ef"></span><span class="sw" style="background:#d8a32e"></span>Two tracks, side by side</h3><p>Every event lives on the <b>record</b> (archaeology, inscriptions, documents) or the <b>tradition</b> (Tanakh, Talmud, memory) — or both, linked where they corroborate. Click one for a verdict: corroborated, partly, contested, or no direct evidence.</p></div>
+    <div class="card"><h3>5,000 years on a globe</h3><p>Spin a 3D globe (or a flat map) shaded by each country's <b>Jewish population</b> over time. Drag the deep-time slider from ancient Mesopotamia to today — or press play.</p></div>
+    <div class="card"><h3>The great migrations</h3><p>Animated arcs trace the movements and <b>why</b> — Assyrian and Babylonian exiles, the Roman dispersion, 1492, the great migration to America, the Holocaust, the ingathering to Israel.</p></div>
+    <div class="card"><h3>Every event, judged</h3><p>Nearly 400 events from the Patriarchs to today, each leading with the evidence and annotating the scholarly consensus — even-handed, never out to "debunk", with sources.</p></div>
+    <div class="card"><h3>Population over time</h3><p>Click any country for its Jewish population trend across the eras, the events that happened there, and who arrived or left. Toggle population, density, or share of world Jewry.</p></div>
+    <div class="card"><h3>Search &amp; share</h3><p>Search any country to fly to it, and copy a link to an exact moment — an era, a country, an event — to share what you've found.</p></div>
+  </div>
+
+  <h2>About the data &amp; the stance</h2>
+  <p class="data">This explorer is <b>evidence-forward and even-handed</b>: it reports the scholarly consensus on
+  what the record supports — corroborated, contested, or unattested — and treats the tradition with respect
+  as a parallel layer of memory. Modern figures (1880–2025) draw on Sergio DellaPergola / the
+  <i>American Jewish Year Book</i>, Pew Research and the Jewish Virtual Library; pre-modern figures are
+  best-effort scholarly estimates. Figures are approximate and illustrative, and the map uses
+  <b>modern national borders at every era</b> as a visualisation device — ancient peoples and polities, not
+  today's nations, occupied that land. Country outlines: Natural Earth (public domain). Globe: globe.gl.</p>
+
+  <div class="privacy">
+    <strong>Privacy:</strong> Jewish History Explorer collects nothing, sends nothing, and makes no network
+    requests. It requests no browser permissions and works fully offline. Read the full
+    <a href="privacy.html">privacy policy</a>.
+  </div>
+
+  <footer>
+    A <a href="https://42-apps.github.io/">42-apps</a> mini-site. &nbsp;·&nbsp; Data: DellaPergola / American
+    Jewish Year Book · Pew Research · Jewish Virtual Library · Encyclopaedia Judaica · the archaeological &amp;
+    documentary record. Borders: Natural Earth. Globe: globe.gl.
+  </footer>
+</div>
+</body>
+</html>

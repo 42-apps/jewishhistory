@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jewish History Explorer</title>
+<link rel="stylesheet" href="jewishhistory.css?v=1">
+</head>
+<body>
+  <!-- ===== Header ===== -->
+  <header id="topbar">
+    <div class="brand">
+      <svg class="logo" viewBox="0 0 32 32" aria-hidden="true">
+        <circle cx="16" cy="16" r="15" fill="rgba(20,40,75,.55)" stroke="rgba(255,255,255,.22)" stroke-width="1"/>
+        <polygon points="16,4 5.61,22 26.39,22" fill="rgba(90,160,239,.16)" stroke="#5aa0ef" stroke-width="1.9" stroke-linejoin="round"/>
+        <polygon points="16,28 26.39,10 5.61,10" fill="rgba(216,163,46,.16)" stroke="#d8a32e" stroke-width="1.9" stroke-linejoin="round"/>
+      </svg>
+      <div class="brand-txt">
+        <span class="brand-name">Jewish History Explorer</span>
+        <span class="brand-sub">Where the Jewish people lived &amp; moved — the record &amp; the tradition</span>
+      </div>
+    </div>
+    <div class="tools">
+      <div id="searchWrap">
+        <input id="search" type="text" placeholder="Search a country…" autocomplete="off" spellcheck="false" aria-label="Search a country">
+        <div id="searchResults" class="hidden"></div>
+      </div>
+      <button id="menuBtn" title="Menu" aria-label="Menu">☰</button>
+      <div id="menu" class="hidden">
+        <button class="mi" id="miView"><span class="mi-ic">🗺</span><span class="mi-tx">Flat map</span></button>
+        <button class="mi" id="miShare"><span class="mi-ic">🔗</span><span class="mi-tx">Share this view</span></button>
+        <div class="mi-sep"></div>
+        <button class="mi mi-globe" id="miSpin"><span class="mi-ic">⟳</span><span class="mi-tx">Auto-rotate</span><span class="mi-state">On</span></button>
+        <button class="mi" id="miReset"><span class="mi-ic">⤢</span><span class="mi-tx">Reset view</span></button>
+        <button class="mi" id="miFull"><span class="mi-ic">⛶</span><span class="mi-tx">Fullscreen</span></button>
+        <div class="mi-sep"></div>
+        <button class="mi" id="miTrend"><span class="mi-ic">📈</span><span class="mi-tx">World Jewry over time</span></button>
+        <button class="mi" id="miHelp"><span class="mi-ic">?</span><span class="mi-tx">How to use</span></button>
+        <button class="mi" id="miAbout"><span class="mi-ic">ℹ</span><span class="mi-tx">About &amp; sources</span></button>
+      </div>
+    </div>
+  </header>
+
+  <div id="focusBanner" class="hidden"></div>
+
+  <!-- ===== Map ===== -->
+  <div id="globeViz"></div>
+  <svg id="flatViz" class="hidden" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg"></svg>
+  <div id="tooltip" class="hidden"></div>
+  <div id="toast" class="hidden"></div>
+
+  <!-- ===== Left: world Jewry + metric + legend ===== -->
+  <div id="legendBox">
+    <div class="gb-title">World Jewry &middot; <span id="gbYear">2025</span></div>
+    <div class="gb-total"><span id="gbTotal">—</span> <small id="gbTotalSub">Jews worldwide</small></div>
+    <div class="metric-row">
+      <button class="metric-btn on" id="mPop" data-metric="pop" title="Number of Jews per country">Population</button>
+      <button class="metric-btn" id="mShare" data-metric="share" title="% of the country that is Jewish">Density</button>
+      <button class="metric-btn" id="mWorld" data-metric="world" title="Share of world Jewry">Share</button>
+    </div>
+    <div class="ramp-cap" id="rampCap">Jewish population</div>
+    <div class="ramp-bar"></div>
+    <div class="ramp-ends"><span id="rampLo">few</span><span id="rampHi">millions</span></div>
+    <div class="gb-rows" id="gbRows"></div>
+    <div class="gb-note">Click a country to explore &middot; figures are approximate estimates</div>
+  </div>
+
+  <!-- ===== Left-bottom: layer toggles ===== -->
+  <div id="layerBox">
+    <div class="layer-row on" id="lyEvents"><span class="layer-sw"></span><span class="layer-ic">📍</span><span class="layer-l">Events</span></div>
+    <div class="layer-row on" id="lyMig"><span class="layer-sw"></span><span class="layer-ic">➹</span><span class="layer-l">Migrations</span></div>
+    <div class="layer-row on" id="lyTrad"><span class="layer-sw"></span><span class="layer-ic">✡</span><span class="layer-l">Tradition layer</span></div>
+  </div>
+
+  <!-- ===== Right: country detail ===== -->
+  <div id="detailCard" class="hidden">
+    <button class="card-close" id="detailClose" title="Close">×</button>
+    <div class="detail-head"><span id="detailFlag" class="detail-flag">🏳️</span>
+      <div><div id="detailName" class="detail-name">—</div>
+      <div class="detail-era-line">in <span id="detailEra">2025</span></div></div>
+    </div>
+    <div class="stat-row">
+      <div class="stat"><div class="stat-v" id="stPop">—</div><div class="stat-l">Jews</div></div>
+      <div class="stat"><div class="stat-v" id="stShare">—</div><div class="stat-l">of country</div></div>
+      <div class="stat"><div class="stat-v" id="stWorld">—</div><div class="stat-l">of world Jewry</div></div>
+    </div>
+    <div class="detail-trend-label">Jewish population over time — click to jump</div>
+    <div id="detailTrend"></div>
+    <div class="detail-events" id="detailEvents"></div>
+    <div id="detailNote" class="detail-note"></div>
+  </div>
+
+  <!-- ===== Right: event verdict card (dual track) ===== -->
+  <div id="eventCard" class="hidden">
+    <button class="card-close" id="eventClose" title="Close">×</button>
+    <div class="ev-top">
+      <div class="ev-cat"><span class="ev-cat-dot" id="evCatDot"></span><span id="evCat">—</span></div>
+      <div class="ev-title" id="evTitle">—</div>
+      <div class="ev-meta" id="evMeta">—</div>
+      <div class="ev-verdict" id="evVerdict"><span class="vd-dot"></span><span id="evVerdictL">—</span></div>
+      <div class="ev-verdict-blurb" id="evVerdictBlurb"></div>
+    </div>
+    <div class="ev-track rec" id="evRecWrap">
+      <div class="ev-track-h"><span class="trk-dot" style="background:var(--record)"></span>The record shows</div>
+      <p id="evRec">—</p>
+    </div>
+    <div class="ev-track trad" id="evTradWrap">
+      <div class="ev-track-h"><span class="trk-dot" style="background:var(--tradition)"></span>Tradition says</div>
+      <p id="evTrad">—</p>
+      <div class="ev-why hidden" id="evWhyWrap"><span class="ev-why-ic">➹</span><span id="evWhy"></span></div>
+    </div>
+    <div class="ev-src" id="evSrcWrap">
+      <div class="ev-src-cap">Sources</div>
+      <div class="ev-src-tags" id="evSrc"></div>
+    </div>
+  </div>
+
+  <!-- ===== Bottom: dual-track timeline ===== -->
+  <div id="timebar">
+    <div class="tl-readhead">
+      <span id="eraLabel" class="era-label">2025</span>
+      <span id="eraBadge" class="era-badge era-contemporary">contemporary</span>
+      <span class="tl-trackkey">
+        <span class="tk"><span class="tk-sw" style="background:var(--record)"></span><b>The record</b></span>
+        <span class="tk"><span class="tk-sw" style="background:var(--tradition)"></span><b>Tradition</b></span>
+        <span class="tk"><span class="tk-link" style="background:#1aa179"></span>corroborated</span>
+        <span class="tk"><span class="tk-link" style="background:#e0962f"></span>partly</span>
+      </span>
+    </div>
+    <svg id="tlChart" viewBox="0 0 1000 104" preserveAspectRatio="none"></svg>
+    <div class="slider-row">
+      <button id="prevEra" class="step" title="Back one period (←)">‹</button>
+      <button id="nextEra" class="step" title="Forward one period (→)">›</button>
+      <input id="timeSlider" type="range" min="0" max="43" value="43" step="1" aria-label="Time">
+      <button id="playRevBtn" class="play" title="Play backward in time">◀</button>
+      <button id="playBtn" class="play" title="Play forward in time">▶</button>
+      <button id="nowBtn" class="nowbtn" title="Jump to today">today</button>
+    </div>
+    <div class="time-ends"><span>3000 BCE</span><span>2025</span></div>
+  </div>
+
+  <!-- ===== About ===== -->
+  <div id="aboutOverlay" class="hidden">
+    <div class="about-box">
+      <button id="aboutClose" class="about-close" title="Close">×</button>
+      <h2>Jewish History Explorer</h2>
+      <p>A map and timeline of the Jewish people across ~5,000 years — <b>where they lived</b> and how
+      many, <b>how and why they moved</b>, and the <b>events</b> that shaped them, from ancient Mesopotamia
+      to today. The globe is shaded by <b>Jewish population</b> over time; arcs trace the great
+      migrations; pins mark the major events.</p>
+      <p>The signature timeline runs along <b>two tracks</b>. The upper <b style="color:#5aa0ef">Record</b>
+      is what archaeology, inscriptions, documents and demography show. The lower
+      <b style="color:#d8a32e">Tradition</b> is what the Tanakh, Talmud, liturgy and memory recount.
+      Click any event to see both sides and a <b>verdict</b> — corroborated, partly, contested, or no
+      direct evidence — where they meet and where they part.</p>
+      <p class="about-cav"><b>Please read:</b> this app is <b>evidence-forward and even-handed</b>. It
+      reports the scholarly consensus on what the record supports; it does not set out to "debunk", and
+      it treats the tradition with respect as a parallel layer of memory. Pre-modern figures are
+      <b>illustrative scholarly estimates</b>; the map uses <b>modern borders at every era</b> as a
+      visualization device, and (for example) splits the Russian Empire's Jewry across today's nations.</p>
+      <p class="about-src">Sources: Sergio DellaPergola / <i>American Jewish Year Book</i> · Pew Research
+      Center · Jewish Virtual Library · <i>Encyclopaedia Judaica</i> · the archaeological &amp; documentary
+      record (Merneptah &amp; Tel Dan stelae, Lachish, Sennacherib's Prism, the Cyrus Cylinder, the
+      Al-Yahudu tablets, the Dead Sea Scrolls, the Cairo Geniza…). Borders: Natural Earth. Globe: globe.gl.</p>
+    </div>
+  </div>
+
+  <!-- ===== First-run tutorial ===== -->
+  <div id="tutorial" class="hidden">
+    <div class="tut-box">
+      <svg class="tut-logo" viewBox="0 0 32 32" aria-hidden="true">
+        <circle cx="16" cy="16" r="15" fill="rgba(20,40,75,.55)" stroke="rgba(255,255,255,.22)" stroke-width="1"/>
+        <polygon points="16,4 5.61,22 26.39,22" fill="rgba(90,160,239,.18)" stroke="#5aa0ef" stroke-width="1.9" stroke-linejoin="round"/>
+        <polygon points="16,28 26.39,10 5.61,10" fill="rgba(216,163,46,.18)" stroke="#d8a32e" stroke-width="1.9" stroke-linejoin="round"/>
+      </svg>
+      <h2>Welcome to Jewish History Explorer</h2>
+      <p class="tut-lead">Watch where the Jewish people lived and moved across ~5,000 years — and see the historical record beside the tradition.</p>
+      <div class="tut-steps">
+        <div class="tut-step"><span class="tut-ic">🕓</span><div><b>Travel through time.</b> Drag the slider or press play; the map, migrations and events update live. Hit <b>today</b> to jump back to now.</div></div>
+        <div class="tut-step"><span class="tut-ic">🗺️</span><div><b>Click any country</b> for its Jewish population over time, and the events that happened there.</div></div>
+        <div class="tut-step"><span class="tut-ic">✡</span><div><b>Two tracks.</b> The timeline shows the <b style="color:#5aa0ef">record</b> on top and <b style="color:#d8a32e">tradition</b> below, linked where they corroborate. Click an event for the verdict.</div></div>
+        <div class="tut-step"><span class="tut-ic">➹</span><div><b>Migrations &amp; layers.</b> Arcs show the great movements; toggle Events, Migrations and the Tradition layer at the lower left.</div></div>
+      </div>
+      <p class="tut-cav">Figures are approximate &amp; illustrative; modern borders are shown at every era as a visual device. See <b>About</b> (in the menu) for the stance &amp; sources.</p>
+      <button id="tutStart" class="tut-btn">Start exploring →</button>
+    </div>
+  </div>
+
+  <!-- ===== Flat-map first-time tip ===== -->
+  <div id="flatTip" class="hidden">
+    <div class="tut-box">
+      <h2>🗺️ The flat map</h2>
+      <p class="tut-lead">Same data as the globe — each country shaded by its <b>Jewish population</b>, with migration arcs and event pins — on a flat (equirectangular) map.</p>
+      <div class="tut-steps">
+        <div class="tut-step"><span class="tut-ic">🔍</span><div><b>Zoom &amp; pan.</b> Scroll to zoom (small countries become readable) and drag to move. Recentre via ☰ → <b>Reset view</b>.</div></div>
+        <div class="tut-step"><span class="tut-ic">👆</span><div><b>Hover</b> any country for its figures; <b>click</b> for the full breakdown. Click a <b>pin</b> for an event.</div></div>
+      </div>
+      <p class="tut-cav">A flat projection stretches the poles (Greenland, Antarctica) and a couple of countries that cross the date line can smear sideways.</p>
+      <button id="ftStart" class="tut-btn">Got it</button>
+    </div>
+  </div>
+
+  <!-- ===== World-Jewry-over-time chart ===== -->
+  <div id="trendOverlay" class="hidden">
+    <div class="trend-box">
+      <button id="trendClose" class="about-close" title="Close">×</button>
+      <h2>World Jewry over time</h2>
+      <p class="trend-sub">Estimated Jewish population worldwide, 1800 BCE → today. Click the chart to jump to that era.</p>
+      <div id="wtChart"></div>
+      <p class="wt-cav">Pre-modern figures are illustrative scholarly estimates; modern data draws on DellaPergola / the American Jewish Year Book and Pew. Peaks: ~16.6M on the eve of WWII, ~11M after the Holocaust, ~15.7M today.</p>
+    </div>
+  </div>
+
+  <script src="lib/globe.gl.min.js"></script>
+  <script src="lib/polygon-clipping.js"></script>
+  <script src="data/timeline.js?v=1"></script>
+  <script src="data/jewish-data.js?v=1"></script>
+  <script src="jewishhistory.js?v=1"></script>
+</body>
+</html>

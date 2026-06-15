@@ -1,0 +1,299 @@
+/* Jewish History Explorer — full-tab globe + dual-track timeline UI */
+:root{
+  --bg:#060e1c; --panel:rgba(13,22,40,.82); --line:rgba(255,255,255,.10);
+  --txt:#e7edf7; --muted:#93a3bd; --accent:#6fb3ff;
+  --record:#5aa0ef; --tradition:#d8a32e;
+  /* era hues (the slider gradient + badges) */
+  --e-ancient:#8a6f3a; --e-classical:#b08a3a; --e-medieval:#3a6d8a;
+  --e-earlymodern:#3a8a6d; --e-modern:#2f6fe0; --e-contemporary:#8a3fb0;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  background:radial-gradient(1200px 820px at 70% -10%,#16335a 0%,#0a1830 45%,#04070f 100%);
+  color:var(--txt); font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  overflow:hidden; user-select:none;
+}
+.hidden{display:none !important}
+
+/* ---- header ---- */
+#topbar{
+  position:fixed; top:0; left:0; right:0; height:54px; z-index:30;
+  display:flex; align-items:center; justify-content:space-between; padding:0 16px;
+  background:linear-gradient(180deg,rgba(6,14,28,.92),rgba(6,14,28,0));
+}
+.brand{display:flex; align-items:center; gap:11px}
+.logo{width:42px; height:42px; filter:drop-shadow(0 2px 6px rgba(0,0,0,.55))}
+.brand-name{font-weight:700; font-size:17px; letter-spacing:.2px; display:block; line-height:1.1}
+.brand-sub{font-size:11px; color:var(--muted)}
+.tools{position:relative; display:flex; align-items:center; gap:8px}
+#searchWrap{position:relative}
+#search{width:184px; height:38px; padding:0 12px; border-radius:10px; font-size:13px;
+  background:var(--panel); color:var(--txt); border:1px solid var(--line); outline:none}
+#search::placeholder{color:var(--muted)}
+#search:focus{border-color:#3d8bff; background:rgba(20,32,56,.92); width:208px}
+#searchResults{position:absolute; top:44px; right:0; width:248px; max-height:320px; overflow:auto; padding:5px; z-index:50;
+  background:var(--panel); border:1px solid var(--line); border-radius:11px; backdrop-filter:blur(10px); box-shadow:0 14px 40px rgba(0,0,0,.5)}
+.sr-item{display:flex; align-items:center; gap:9px; padding:8px 10px; border-radius:7px; font-size:13px; cursor:pointer}
+.sr-item:hover,.sr-item.sel{background:rgba(255,255,255,.1)}
+.sr-flag{font-size:15px; flex:none}
+.sr-none{padding:9px 10px; color:var(--muted); font-size:12.5px}
+#menuBtn{width:40px; height:40px; flex:none; border-radius:10px; cursor:pointer; font-size:18px; line-height:1;
+  background:var(--panel); color:var(--txt); border:1px solid var(--line)}
+#menuBtn:hover{background:rgba(40,60,100,.85)}
+#menu{position:absolute; top:48px; right:0; width:226px; padding:6px; border-radius:13px; z-index:50;
+  background:var(--panel); border:1px solid var(--line); backdrop-filter:blur(10px); box-shadow:0 16px 44px rgba(0,0,0,.55);
+  display:flex; flex-direction:column; gap:2px}
+.mi{display:flex; align-items:center; gap:10px; width:100%; padding:9px 11px; border:none; border-radius:8px;
+  background:transparent; color:var(--txt); font:inherit; font-size:13px; cursor:pointer; text-align:left}
+.mi:hover{background:rgba(255,255,255,.09)}
+.mi.on .mi-tx{color:#9cc6ff}
+.mi-ic{width:18px; text-align:center; font-size:14px; flex:none}
+.mi-tx{flex:1}
+.mi-state{font-size:11px; color:var(--muted); font-weight:600}
+.mi-sep{height:1px; background:var(--line); margin:4px 6px}
+
+/* ---- toast ---- */
+#toast{position:fixed; left:50%; bottom:170px; transform:translateX(-50%); z-index:60;
+  padding:10px 16px; border-radius:10px; font-size:13px; font-weight:600;
+  background:rgba(12,20,38,.97); color:#eaf1fb; border:1px solid var(--line); box-shadow:0 10px 30px rgba(0,0,0,.5)}
+
+/* ---- globe / flat map ---- */
+#globeViz{position:fixed; inset:54px 0 188px 0}
+#flatViz{position:fixed; inset:54px 0 188px 0; z-index:1; cursor:grab}
+.flat-ocean{fill:rgba(18,34,64,.4)}
+.flat-cell{pointer-events:none}
+.flat-hit{fill:transparent; pointer-events:all; stroke:rgba(8,12,24,.55); stroke-width:0.7; cursor:pointer}
+.flat-hit:hover{stroke:#fff; stroke-width:1.4}
+.flat-hit.sel{stroke:#fff; stroke-width:2.2}
+/* flat-map event pins + arcs */
+.flat-arc{fill:none; opacity:.85; pointer-events:none}
+.flat-pin{cursor:pointer}
+.flat-pin circle{stroke:rgba(6,12,24,.8); stroke-width:1}
+
+/* ---- tooltip ---- */
+#tooltip{
+  position:absolute; z-index:40; pointer-events:none; transform:translate(14px,14px);
+  min-width:170px; max-width:250px; padding:9px 11px; border-radius:11px;
+  background:var(--panel); backdrop-filter:blur(7px); border:1px solid var(--line);
+  box-shadow:0 8px 28px rgba(0,0,0,.45);
+}
+.tt-head{display:flex; align-items:center; gap:7px; margin-bottom:6px}
+.tt-flag{font-size:15px}
+.tt-name{font-weight:600; flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.tt-era{font-size:10.5px; color:var(--muted)}
+.tt-pop{font-size:13px; margin-bottom:3px}
+.tt-pop b{font-size:15px; font-variant-numeric:tabular-nums}
+.tt-sub{font-size:11.5px; color:var(--muted)}
+.tt-nd{color:var(--muted); font-size:12px; font-style:italic}
+.tt-ev{display:flex; align-items:center; gap:7px; margin-top:7px; padding-top:7px; border-top:1px solid var(--line); font-size:12px}
+.tt-ev .tt-cat{width:9px; height:9px; border-radius:50%; flex:none}
+
+/* ---- left panel: world Jewry + legend + controls ---- */
+#legendBox{
+  position:fixed; left:14px; top:70px; z-index:25; width:248px;
+  padding:13px 15px; border-radius:14px; background:var(--panel);
+  border:1px solid var(--line); backdrop-filter:blur(8px); box-shadow:0 10px 34px rgba(0,0,0,.45);
+}
+.gb-title{font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin-bottom:4px}
+.gb-title span{color:var(--txt); font-weight:600}
+.gb-total{font-size:23px; font-weight:800; letter-spacing:.3px; font-variant-numeric:tabular-nums; margin-bottom:2px}
+.gb-total small{font-size:12px; font-weight:600; color:var(--muted); letter-spacing:0}
+.gb-rows{margin:9px 0 2px; max-height:30vh; overflow:auto}
+.gb-row{display:flex; align-items:center; gap:8px; font-size:12.5px; padding:3px 6px; border-radius:6px; cursor:pointer}
+.gb-row:hover{background:rgba(255,255,255,.07)}
+.gb-rank{width:14px; color:var(--muted); font-size:11px; flex:none; text-align:right}
+.gb-l{flex:1; color:#d4deee; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.gb-v{color:#fff; font-variant-numeric:tabular-nums; font-weight:600}
+.gb-note{margin-top:8px; font-size:9.5px; color:#6f7c93; letter-spacing:.02em}
+
+/* metric toggle */
+.metric-row{display:flex; gap:4px; margin:11px 0 9px}
+.metric-btn{flex:1; padding:6px 4px; border-radius:8px; cursor:pointer; font-size:11px; font-weight:600; text-align:center;
+  background:rgba(255,255,255,.05); color:var(--muted); border:1px solid var(--line)}
+.metric-btn:hover{background:rgba(255,255,255,.1); color:var(--txt)}
+.metric-btn.on{background:#2f6fe0; color:#fff; border-color:#6fb3ff}
+/* legend ramp */
+.ramp-cap{font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-bottom:5px}
+.ramp-bar{height:10px; border-radius:5px; box-shadow:inset 0 0 0 1px rgba(0,0,0,.3);
+  background:linear-gradient(90deg,#1b2c49,#1f4f9e,#2f8fe0,#5ad0ff,#eaf6ff)}
+.ramp-ends{display:flex; justify-content:space-between; font-size:9.5px; color:var(--muted); margin-top:3px; font-variant-numeric:tabular-nums}
+
+/* ---- layer toggles (left, under legend) ---- */
+#layerBox{
+  position:fixed; left:14px; bottom:198px; z-index:25; width:248px;
+  padding:9px 12px; border-radius:13px; background:var(--panel);
+  border:1px solid var(--line); backdrop-filter:blur(8px); box-shadow:0 10px 30px rgba(0,0,0,.4);
+}
+.layer-row{display:flex; align-items:center; gap:9px; padding:5px 4px; font-size:12.5px; cursor:pointer; border-radius:6px}
+.layer-row:hover{background:rgba(255,255,255,.06)}
+.layer-sw{width:30px; height:17px; border-radius:10px; background:rgba(255,255,255,.12); position:relative; flex:none; transition:background .15s}
+.layer-sw::after{content:""; position:absolute; top:2px; left:2px; width:13px; height:13px; border-radius:50%; background:#cfd9ec; transition:left .15s}
+.layer-row.on .layer-sw{background:#2f6fe0}
+.layer-row.on .layer-sw::after{left:15px; background:#fff}
+.layer-ic{width:14px; text-align:center; flex:none}
+.layer-l{flex:1; color:#d4deee}
+.layer-row.on .layer-l{color:#fff}
+
+/* ---- country detail card (right) ---- */
+#detailCard{
+  position:fixed; right:14px; top:70px; z-index:35; width:286px;
+  padding:16px 16px 14px; border-radius:14px; background:var(--panel);
+  border:1px solid var(--line); backdrop-filter:blur(9px); box-shadow:0 12px 40px rgba(0,0,0,.5);
+  max-height:calc(100vh - 210px); overflow:auto;
+}
+.card-close{position:absolute; top:8px; right:9px; width:24px; height:24px; border:none; border-radius:7px;
+  background:transparent; color:var(--muted); font-size:18px; cursor:pointer}
+.card-close:hover{background:rgba(255,255,255,.08); color:#fff}
+.detail-head{display:flex; align-items:center; gap:11px; margin-bottom:12px}
+.detail-flag{font-size:26px}
+.detail-name{font-weight:700; font-size:16px}
+.detail-era-line{font-size:11.5px; color:var(--muted)}
+.stat-row{display:flex; gap:8px; margin-bottom:12px}
+.stat{flex:1; background:rgba(255,255,255,.05); border-radius:9px; padding:8px 9px}
+.stat-v{font-size:17px; font-weight:700; font-variant-numeric:tabular-nums; line-height:1.1}
+.stat-l{font-size:10px; color:var(--muted); letter-spacing:.03em; margin-top:2px}
+.detail-trend-label{font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin:6px 0 5px}
+#detailTrend{cursor:pointer}
+.trend{display:block; border-radius:7px; background:rgba(0,0,0,.22)}
+.detail-events{margin-top:12px; padding-top:10px; border-top:1px solid var(--line)}
+.de-cap{font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-bottom:6px}
+.de-item{display:flex; align-items:flex-start; gap:8px; padding:5px 6px; border-radius:7px; cursor:pointer; font-size:12px}
+.de-item:hover{background:rgba(255,255,255,.07)}
+.de-dot{width:9px; height:9px; border-radius:50%; flex:none; margin-top:3px}
+.de-yr{color:var(--muted); font-variant-numeric:tabular-nums; flex:none; width:54px; font-size:11px}
+.de-t{flex:1; color:#d4deee}
+.detail-note{margin-top:11px; padding-top:10px; border-top:1px solid var(--line);
+  font-size:11px; line-height:1.55; color:#aebbd2}
+
+/* ---- event verdict card (the dual "parallel universes" card) ---- */
+#eventCard{
+  position:fixed; right:14px; top:70px; z-index:36; width:330px;
+  border-radius:14px; background:var(--panel);
+  border:1px solid var(--line); backdrop-filter:blur(9px); box-shadow:0 12px 44px rgba(0,0,0,.55);
+  max-height:calc(100vh - 210px); overflow:auto;
+}
+.ev-top{padding:16px 16px 12px; border-bottom:1px solid var(--line)}
+.ev-cat{display:inline-flex; align-items:center; gap:6px; font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin-bottom:7px}
+.ev-cat .ev-cat-dot{width:9px; height:9px; border-radius:50%; flex:none}
+.ev-title{font-weight:800; font-size:18px; line-height:1.2; padding-right:22px}
+.ev-meta{font-size:12px; color:var(--muted); margin-top:4px}
+.ev-verdict{display:inline-flex; align-items:center; gap:7px; margin-top:11px; padding:5px 11px; border-radius:20px;
+  font-size:12px; font-weight:700}
+.ev-verdict .vd-dot{width:9px; height:9px; border-radius:50%}
+.ev-verdict-blurb{font-size:11px; color:var(--muted); margin-top:6px; line-height:1.5}
+/* the two tracks */
+.ev-track{padding:13px 16px}
+.ev-track + .ev-track{border-top:1px solid var(--line)}
+.ev-track-h{display:flex; align-items:center; gap:8px; font-size:11px; letter-spacing:.07em; text-transform:uppercase; font-weight:700; margin-bottom:6px}
+.ev-track-h .trk-dot{width:10px; height:10px; border-radius:3px; flex:none}
+.ev-track.rec .ev-track-h{color:var(--record)}
+.ev-track.trad .ev-track-h{color:var(--tradition)}
+.ev-track p{margin:0; font-size:13px; line-height:1.6; color:#d7e1f1}
+.ev-why{margin-top:9px; font-size:12px; color:#b7c4da; font-style:italic; display:flex; gap:7px}
+.ev-why .ev-why-ic{flex:none}
+.ev-src{padding:11px 16px 14px; border-top:1px solid var(--line)}
+.ev-src-cap{font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-bottom:6px}
+.ev-src-tags{display:flex; flex-wrap:wrap; gap:5px}
+.ev-tag{font-size:10.5px; color:#bcc9df; background:rgba(255,255,255,.07); border:1px solid var(--line); border-radius:20px; padding:3px 9px}
+
+/* ====================== dual-track timeline (bottom) ====================== */
+#timebar{
+  position:fixed; left:0; right:0; bottom:0; z-index:30; padding:8px 0 10px;
+  background:linear-gradient(0deg,rgba(6,14,28,.97) 60%,rgba(6,14,28,0));
+  display:flex; flex-direction:column; align-items:center; gap:5px;
+}
+.tl-readhead{display:flex; align-items:center; gap:12px; justify-content:center}
+.era-label{font-size:26px; font-weight:800; letter-spacing:.5px; font-variant-numeric:tabular-nums}
+.era-badge{font-size:10px; letter-spacing:.12em; text-transform:uppercase; padding:2px 8px; border-radius:20px; color:#fff}
+.era-ancient{background:var(--e-ancient)} .era-classical{background:var(--e-classical)}
+.era-medieval{background:var(--e-medieval)} .era-earlymodern{background:var(--e-earlymodern)}
+.era-modern{background:var(--e-modern)} .era-contemporary{background:var(--e-contemporary)}
+.tl-trackkey{display:flex; gap:14px; font-size:11px; color:var(--muted)}
+.tl-trackkey b{font-weight:600}
+.tl-trackkey .tk{display:inline-flex; align-items:center; gap:6px}
+.tl-trackkey .tk-sw{width:11px; height:11px; border-radius:3px}
+.tl-trackkey .tk-link{width:16px; height:4px; border-radius:2px}
+
+/* the SVG dual-track chart */
+#tlChart{width:min(1080px,94vw); height:104px; cursor:pointer; touch-action:none}
+#tlChart text{font-family:inherit}
+.tl-band{}
+.tl-axis{stroke:rgba(255,255,255,.16)}
+.tl-tick{fill:#7e8aa3; font-size:9px}
+.tl-bridge{stroke-linecap:round}
+.tl-dot{cursor:pointer; transition:r .1s}
+.tl-dot:hover{stroke:#fff; stroke-width:2}
+.tl-dot.sel{stroke:#fff; stroke-width:2.5}
+.tl-lane-l{fill:var(--muted); font-size:10.5px; font-weight:600}
+.tl-playhead{stroke:#fff; stroke-width:1.5; opacity:.9}
+.tl-playhead-grip{fill:#fff}
+
+.slider-row{display:flex; align-items:center; gap:10px; width:min(1080px,94vw)}
+.slider-row .step,.slider-row .play{
+  flex:none; border-radius:50%; cursor:pointer; line-height:1;
+  background:var(--panel); color:var(--txt); border:1px solid var(--line);
+}
+.slider-row .step{width:28px; height:28px; font-size:18px; color:var(--muted)}
+.slider-row .play{width:32px; height:32px; font-size:13px; font-weight:700}
+.slider-row .step:hover{background:rgba(40,60,100,.85); color:#fff}
+.slider-row .play:hover{background:rgba(40,60,100,.9); border-color:#3d8bff; color:#fff}
+.slider-row .play.on{background:#2f6fe0; border-color:#9cc6ff; color:#fff;
+  box-shadow:0 0 0 3px rgba(47,111,224,.30), 0 0 14px rgba(111,179,255,.7)}
+.nowbtn{height:30px; padding:0 12px; flex:none; border-radius:15px; cursor:pointer; font-size:11px; font-weight:700;
+  letter-spacing:.04em; text-transform:uppercase; background:var(--panel); color:var(--accent); border:1px solid var(--line)}
+.nowbtn:hover{background:#2f6fe0; color:#fff; border-color:#3d8bff}
+#timeSlider{
+  flex:1; -webkit-appearance:none; appearance:none; height:6px; border-radius:6px; outline:none;
+  background:linear-gradient(90deg,
+    var(--e-ancient) 0%,var(--e-ancient) 25.6%,
+    var(--e-classical) 25.6%,var(--e-classical) 37.2%,
+    var(--e-medieval) 37.2%,var(--e-medieval) 58.1%,
+    var(--e-earlymodern) 58.1%,var(--e-earlymodern) 69.8%,
+    var(--e-modern) 69.8%,var(--e-modern) 86%,
+    var(--e-contemporary) 86%,var(--e-contemporary) 100%);
+}
+#timeSlider::-webkit-slider-thumb{-webkit-appearance:none; width:16px; height:16px; border-radius:50%;
+  background:#fff; border:2px solid #2f6fe0; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,.5)}
+#timeSlider::-moz-range-thumb{width:16px; height:16px; border-radius:50%; background:#fff; border:2px solid #2f6fe0; cursor:pointer}
+.time-ends{display:flex; justify-content:space-between; width:min(1080px,94vw); font-size:10px; color:var(--muted)}
+
+/* ---- overlays (about / tutorial / trend) ---- */
+#aboutOverlay,#tutorial,#flatTip,#trendOverlay{position:fixed; inset:0; z-index:70; display:flex; align-items:center; justify-content:center;
+  background:rgba(3,7,15,.74); backdrop-filter:blur(4px)}
+.about-box,.tut-box,.trend-box{position:relative; width:min(580px,92vw); max-height:88vh; overflow:auto; padding:26px 28px;
+  border-radius:16px; background:#0c1a30; border:1px solid var(--line); box-shadow:0 24px 70px rgba(0,0,0,.6)}
+.about-box h2,.trend-box h2{margin:0 0 12px; font-size:22px}
+.about-box p{margin:0 0 12px; color:#cdd8ea; line-height:1.6}
+.about-cav{font-size:13px; color:#b7c4da !important}
+.about-src{font-size:11.5px; color:var(--muted) !important}
+.about-close{position:absolute; top:12px; right:14px; width:28px; height:28px; border:none; border-radius:8px;
+  background:transparent; color:var(--muted); font-size:20px; cursor:pointer}
+.about-close:hover{background:rgba(255,255,255,.08); color:#fff}
+.tut-box{width:min(540px,92vw); text-align:center; background:linear-gradient(180deg,#0e1f39,#0a1426)}
+.tut-logo{width:64px; height:64px; border-radius:16px; box-shadow:0 6px 20px rgba(0,0,0,.5); margin-bottom:14px}
+.tut-box h2{margin:0 0 8px; font-size:23px}
+.tut-lead{margin:0 0 18px; color:#cdd8ea; line-height:1.55}
+.tut-steps{display:flex; flex-direction:column; gap:12px; text-align:left; margin-bottom:18px}
+.tut-step{display:flex; gap:12px; align-items:flex-start; font-size:13.5px; line-height:1.5; color:#d6e0f0}
+.tut-step b{color:#fff}
+.tut-ic{font-size:20px; flex:none; width:26px; text-align:center}
+.tut-cav{font-size:11.5px; color:var(--muted); line-height:1.5; margin:0 0 18px}
+.tut-btn{padding:11px 22px; border:none; border-radius:11px; cursor:pointer; font-size:14px; font-weight:700;
+  background:#2f6fe0; color:#fff; box-shadow:0 6px 18px rgba(47,111,224,.5)}
+.tut-btn:hover{background:#3d8bff}
+.trend-sub{margin:0 0 14px; font-size:12.5px; color:var(--muted)}
+.wt-svg{width:100%; height:auto; display:block; cursor:pointer; border-radius:8px; background:rgba(0,0,0,.22)}
+.wt-cav{margin:14px 0 0; font-size:11px; color:#6f7c93; line-height:1.5}
+
+/* focus banner (verdict / track filter) */
+#focusBanner{position:fixed; top:60px; left:50%; transform:translateX(-50%); z-index:28; padding:6px 15px; border-radius:20px;
+  background:var(--panel); border:1px solid var(--line); backdrop-filter:blur(7px); font-size:12.5px; cursor:pointer; box-shadow:0 6px 20px rgba(0,0,0,.4)}
+#focusBanner:hover{background:rgba(40,60,100,.85)}
+.fb-x{color:var(--muted)}
+
+@media (max-width:760px){
+  #legendBox{width:200px} #layerBox{width:200px; bottom:202px}
+  #detailCard,#eventCard{width:min(330px,92vw)}
+  .brand-sub{display:none}
+}
