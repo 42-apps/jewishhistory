@@ -94,12 +94,17 @@ body{
   position:fixed; left:14px; top:70px; z-index:25; width:248px;
   padding:13px 15px; border-radius:14px; background:var(--panel);
   border:1px solid var(--line); backdrop-filter:blur(8px); box-shadow:0 10px 34px rgba(0,0,0,.45);
+  display:flex; flex-direction:column; max-height:calc(100vh - 388px); overflow:hidden;
 }
+#legendBox > *:not(.gb-rows){flex:0 0 auto}
 .gb-title{font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin-bottom:4px}
 .gb-title span{color:var(--txt); font-weight:600}
 .gb-total{font-size:23px; font-weight:800; letter-spacing:.3px; font-variant-numeric:tabular-nums; margin-bottom:2px}
 .gb-total small{font-size:12px; font-weight:600; color:var(--muted); letter-spacing:0}
-.gb-rows{margin:9px 0 2px; max-height:30vh; overflow:auto}
+.gb-rows{margin:9px 0 2px; flex:1 1 auto; min-height:84px; overflow-y:auto; overscroll-behavior:contain}
+.gb-rows::-webkit-scrollbar{width:7px}
+.gb-rows::-webkit-scrollbar-thumb{background:rgba(255,255,255,.16); border-radius:4px}
+.gb-rows::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.28)}
 .gb-row{display:flex; align-items:center; gap:8px; font-size:12.5px; padding:3px 6px; border-radius:6px; cursor:pointer}
 .gb-row:hover{background:rgba(255,255,255,.07)}
 .gb-rank{width:14px; color:var(--muted); font-size:11px; flex:none; text-align:right}

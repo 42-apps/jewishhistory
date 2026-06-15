@@ -360,11 +360,13 @@ function updateWorldBox() {
   const total = worldTotal(year);
   document.getElementById('gbTotal').textContent = fmtPop(total);
   const rows = Object.keys(DATA).map(iso => { const v = valAt(DATA[iso], year); return v && v.pop > 0 ? { iso, n: DATA[iso].n, pop: v.pop, share: v.share } : null; })
-    .filter(Boolean).sort((a, b) => b.pop - a.pop).slice(0, 8);
+    .filter(Boolean).sort((a, b) => b.pop - a.pop);
   document.getElementById('gbRows').innerHTML = rows.map((r, i) => {
     let val = state.metric === 'world' ? Math.round(r.pop / (total || 1) * 100) + '%' : fmtPop(r.pop);
     return `<div class="gb-row" data-iso="${r.iso}"><span class="gb-rank">${i + 1}</span><span class="gb-l">${r.n}</span><span class="gb-v">${val}</span></div>`;
   }).join('') || '<div class="tt-nd" style="padding:6px">No recorded communities this era.</div>';
+  const gbNote = document.querySelector('#legendBox .gb-note');
+  if (gbNote) gbNote.textContent = rows.length ? rows.length + ' countries with Jews · scroll for all · click to explore' : 'No communities recorded this era';
 }
 document.getElementById('gbRows').addEventListener('click', e => { const row = e.target.closest('.gb-row'); if (row) gotoCountry(row.dataset.iso); });
 
