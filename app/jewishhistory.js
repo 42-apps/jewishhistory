@@ -72,7 +72,10 @@ function geoIsoSet() { if (!_geoIso || _geoIso.__n !== countries.length) { _geoI
 // Communities with no map polygon (microstates/territories) → rendered as dots at their lat/lng.
 function communityDots() { const set = geoIsoSet(), year = curYear(), out = []; for (const iso in DATA) { const rec = DATA[iso]; if (set.has(iso) || rec.lat == null) continue; const v = valAt(rec, year); if (v && v.pop > 0) out.push({ iso, lat: rec.lat, lng: rec.lng, __community: true }); } return out; }
 // Jewish % of a country's total population: the data's `share` if present, else estimate from Natural Earth POP_EST.
-function densityPct(iso, v) { if (v && v.share != null) return v.share; const pe = popEstOf(iso); return (v && pe > 0) ? Math.min(100, v.pop / pe * 100) : 0; }
+// Total population of list-only territories/microstates (absent from the 1:110m polygons), for the density metric.
+const TERR_POP = { AD:80000, AW:106000, AX:30000, BB:281000, BH:1500000, BM:64000, BQ:27000, CW:155000, FM:113000, FO:54000, GF:300000, GG:67000, GI:33000, GP:396000, GU:170000, HK:7400000, IM:84000, JE:108000, KI:120000, KY:69000, LI:39000, MC:39000, MH:42000, MQ:360000, MT:520000, MU:1270000, MV:540000, NR:12000, PW:18000, RE:870000, SG:5900000, SJ:2900, SM:34000, SX:44000, TC:46000, TO:105000, TV:11000, VA:800, VI:87000, WS:220000 };
+// Jewish % of total population: explicit `share` (when > 0) wins; else compute from POP_EST (polygons) or TERR_POP (territories); null if no denominator.
+function densityPct(iso, v) { if (!v || !(v.pop > 0)) return 0; if (v.share != null && v.share > 0) return v.share; const pe = popEstOf(iso) || TERR_POP[iso] || 0; return pe > 0 ? Math.min(100, v.pop / pe * 100) : null; }
 function fmtPct(p) { if (p == null) return '—'; if (p >= 10) return Math.round(p) + '%'; if (p >= 1) return p.toFixed(1) + '%'; if (p >= 0.01) return p.toFixed(2) + '%'; if (p > 0) return '<0.01%'; return '0%'; }
 // Map a country's value to 0..1 intensity for the active metric.
 function metricT(v, year, iso) {
@@ -378,7 +381,7 @@ function updateWorldBox() {
   document.getElementById('gbTotal').textContent = fmtPop(total);
   const m = state.metric;
   const rows = Object.keys(DATA).map(iso => { const v = valAt(DATA[iso], year); return v && v.pop > 0 ? { iso, n: DATA[iso].n, pop: v.pop, dens: densityPct(iso, v), worldPct: total ? v.pop / total * 100 : 0 } : null; })
-    .filter(Boolean).sort((a, b) => m === 'share' ? b.dens - a.dens : b.pop - a.pop);
+    .filter(Boolean).sort((a, b) => m === 'share' ? ((b.dens == null ? -1 : b.dens) - (a.dens == null ? -1 : a.dens)) : b.pop - a.pop);
   document.getElementById('gbRows').innerHTML = rows.map((r, i) => {
     const val = m === 'share' ? fmtPct(r.dens) : m === 'world' ? fmtPct(r.worldPct) : fmtPop(r.pop);
     return `<div class="gb-row" data-iso="${r.iso}"><span class="gb-rank">${i + 1}</span><span class="gb-l">${r.n}</span><span class="gb-v">${val}</span></div>`;
