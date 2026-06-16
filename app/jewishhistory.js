@@ -65,10 +65,15 @@ function worldTotal(year) {
   return (_wt[year] = s);
 }
 const clamp01 = t => Math.max(0, Math.min(1, t));
+let _popEst = null;
+function popEstOf(iso) { if (!_popEst || _popEst.__n !== countries.length) { _popEst = { __n: countries.length }; for (const f of countries) { const i = isoOf(f.properties); if (i) _popEst[i] = (_popEst[i] || 0) + (Number(f.properties.POP_EST) || 0); } } return _popEst[iso] || 0; }
+// Jewish % of a country's total population: the data's `share` if present, else estimate from Natural Earth POP_EST.
+function densityPct(iso, v) { if (v && v.share != null) return v.share; const pe = popEstOf(iso); return (v && pe > 0) ? Math.min(100, v.pop / pe * 100) : 0; }
+function fmtPct(p) { if (p == null) return '—'; if (p >= 10) return Math.round(p) + '%'; if (p >= 1) return p.toFixed(1) + '%'; if (p > 0) return p.toFixed(2) + '%'; return '0%'; }
 // Map a country's value to 0..1 intensity for the active metric.
-function metricT(v, year) {
+function metricT(v, year, iso) {
   if (!v || v.pop <= 0) return null;
-  if (state.metric === 'share') return clamp01(Math.sqrt((v.share || 0) / 100));
+  if (state.metric === 'share') return clamp01(Math.sqrt(densityPct(iso, v) / 100));
   if (state.metric === 'world') { const w = worldTotal(year) || 1; return clamp01(Math.sqrt((v.pop / w) / 0.45)); }
   return clamp01((Math.log10(v.pop) - 1) / (Math.log10(7e6) - 1));   // pop, log scale (10 → 7M)
 }
@@ -123,14 +128,14 @@ function capColor(feat) {
     if (v && v.pop <= 0) return (sel || hov) ? 'rgba(90,100,130,0.4)' : EMPTIED;
     return (sel || hov) ? 'rgba(120,130,160,0.4)' : NEUTRAL;
   }
-  const t = metricT(v, curYear());
+  const t = metricT(v, curYear(), iso);
   return rgbaT(t, sel ? 0.99 : hov ? 0.95 : 0.86);
 }
 function altOf(feat) {
   const iso = isoOf(feat.properties);
   const v = iso ? valAt(DATA[iso], curYear()) : null;
   let base = 0.01;
-  if (v && v.pop > 0) base = 0.01 + (metricT(v, curYear()) || 0) * 0.13;
+  if (v && v.pop > 0) base = 0.01 + (metricT(v, curYear(), iso) || 0) * 0.13;
   if (state.selected && iso === state.selected) base += 0.04;
   else if (state.hovered && iso === state.hovered) base += 0.025;
   return base;
@@ -234,7 +239,7 @@ function tooltipHTML(iso, feat) {
   const w = worldTotal(curYear()) || 1;
   let body = `<div class="tt-pop"><b>${fmtPop(v.pop)}</b> Jews</div>`;
   const bits = [];
-  if (v.share != null) bits.push(v.share >= 1 ? Math.round(v.share) + '% of country' : v.share.toFixed(1) + '% of country');
+  bits.push(fmtPct(densityPct(iso, v)) + ' of country');
   if (v.pop > 0) bits.push((v.pop / w * 100 < 1 ? (v.pop / w * 100).toFixed(1) : Math.round(v.pop / w * 100)) + '% of world Jewry');
   body += `<div class="tt-sub">${bits.join(' · ')}</div>`;
   return head + body;
@@ -296,7 +301,7 @@ function showDetail(iso, feat) {
   document.getElementById('detailName').textContent = nameOf(iso, feat);
   document.getElementById('detailEra').textContent = STEPS[state.stepIdx].label;
   document.getElementById('stPop').textContent = v ? fmtPop(v.pop) : '—';
-  document.getElementById('stShare').textContent = (v && v.share != null) ? (v.share >= 1 ? Math.round(v.share) + '%' : v.share.toFixed(1) + '%') : '—';
+  document.getElementById('stShare').textContent = v ? fmtPct(densityPct(iso, v)) : '—';
   document.getElementById('stWorld').textContent = (v && v.pop > 0) ? ((v.pop / w * 100) < 1 ? (v.pop / w * 100).toFixed(1) + '%' : Math.round(v.pop / w * 100) + '%') : '—';
   document.getElementById('detailTrend').innerHTML = rec ? popTrendSVG(rec) : '<div class="tt-nd">No population data.</div>';
   const evs = eventsInCountry(iso);
@@ -359,14 +364,16 @@ function updateWorldBox() {
   document.getElementById('gbYear').textContent = STEPS[state.stepIdx].label;
   const total = worldTotal(year);
   document.getElementById('gbTotal').textContent = fmtPop(total);
-  const rows = Object.keys(DATA).map(iso => { const v = valAt(DATA[iso], year); return v && v.pop > 0 ? { iso, n: DATA[iso].n, pop: v.pop, share: v.share } : null; })
-    .filter(Boolean).sort((a, b) => b.pop - a.pop);
+  const m = state.metric;
+  const rows = Object.keys(DATA).map(iso => { const v = valAt(DATA[iso], year); return v && v.pop > 0 ? { iso, n: DATA[iso].n, pop: v.pop, dens: densityPct(iso, v), worldPct: total ? v.pop / total * 100 : 0 } : null; })
+    .filter(Boolean).sort((a, b) => m === 'share' ? b.dens - a.dens : b.pop - a.pop);
   document.getElementById('gbRows').innerHTML = rows.map((r, i) => {
-    let val = state.metric === 'world' ? Math.round(r.pop / (total || 1) * 100) + '%' : fmtPop(r.pop);
+    const val = m === 'share' ? fmtPct(r.dens) : m === 'world' ? fmtPct(r.worldPct) : fmtPop(r.pop);
     return `<div class="gb-row" data-iso="${r.iso}"><span class="gb-rank">${i + 1}</span><span class="gb-l">${r.n}</span><span class="gb-v">${val}</span></div>`;
   }).join('') || '<div class="tt-nd" style="padding:6px">No recorded communities this era.</div>';
+  const basis = m === 'share' ? 'by % of each country' : m === 'world' ? 'by share of world Jewry' : 'by population';
   const gbNote = document.querySelector('#legendBox .gb-note');
-  if (gbNote) gbNote.textContent = rows.length ? rows.length + ' countries with Jews · scroll for all · click to explore' : 'No communities recorded this era';
+  if (gbNote) gbNote.textContent = rows.length ? `${rows.length} countries · sorted ${basis} · click to explore` : 'No communities recorded this era';
 }
 document.getElementById('gbRows').addEventListener('click', e => { const row = e.target.closest('.gb-row'); if (row) gotoCountry(row.dataset.iso); });
 
@@ -506,7 +513,7 @@ function updateFlatColors() {
     const el = document.querySelector('.flat-cell[data-iso="' + iso + '"]'); if (!el) continue;
     const v = valAt(DATA[iso], year);
     if (!v || v.pop <= 0) { el.setAttribute('fill', v && v.pop <= 0 ? EMPTIED : NEUTRAL); continue; }
-    el.setAttribute('fill', rgbaT(metricT(v, year), 0.9));
+    el.setAttribute('fill', rgbaT(metricT(v, year, iso), 0.9));
   }
   syncFlatSelection();
 }
