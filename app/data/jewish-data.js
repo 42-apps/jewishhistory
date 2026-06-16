@@ -43,7 +43,7 @@ window.JEWISH_DATA = {
     '1200': { pop: 1000 }, '1500': { pop: 2000 }, '1600': { pop: 5000 }, '1648': { pop: 3000 }, '1700': { pop: 3000 }, '1772': { pop: 5000 }, '1800': { pop: 8000 }, '1850': { pop: 10000 }, '1880': { pop: 12000 }, '1900': { pop: 12000 }, '1914': { pop: 35000 }, '1933': { pop: 60000, share: 0.7 }, '1939': { pop: 70000 }, '1945': { pop: 25000 }, '1948': { pop: 30000 }, '1950': { pop: 30000 }, '1970': { pop: 40000 }, '1990': { pop: 32000 }, '2010': { pop: 30000 }, '2025': { pop: 29000, share: 0.3 } } },
   BG: { n: "Bulgaria", note: "Bulgarian government refused to deport its ~50,000 native Jews; ~11,300 Jews in Bulgarian-occupied Greek and Macedonian territories were deported. ~90% of survivors emigrated to Israel 1948–1950.", s: {
     '-333': { pop: 3000 }, '-63': { pop: 8000 }, '70': { pop: 10000 }, '300': { pop: 8000 }, '500': { pop: 6000 }, '750': { pop: 5000 }, '1000': { pop: 5000 }, '1200': { pop: 6000 }, '1492': { pop: 12000 }, '1500': { pop: 15000 }, '1600': { pop: 18000 }, '1700': { pop: 16000 }, '1800': { pop: 15000 }, '1850': { pop: 20000 }, '1880': { pop: 25000 }, '1900': { pop: 35000, share: 1 }, '1914': { pop: 40000 }, '1933': { pop: 48000, share: 0.8 }, '1939': { pop: 50000, share: 0.8 }, '1945': { pop: 49000, share: 0.7 }, '1948': { pop: 46000 }, '1950': { pop: 8000 }, '1970': { pop: 5000 }, '1990': { pop: 3500 }, '2010': { pop: 2500 }, '2025': { pop: 2000 } } },
-  BH: { n: "Bahrain", note: "Small but rooted community descended from Iraqi and Persian Jewish merchants who arrived from 1890s; synagogue destroyed in 1947 riots; native community of ~50 survives today alongside expats post-Abraham Accords.", s: {
+  BH: { n: "Bahrain", lat: 26.22, lng: 50.58, note: "Small but rooted community descended from Iraqi and Persian Jewish merchants who arrived from 1890s; synagogue destroyed in 1947 riots; native community of ~50 survives today alongside expats post-Abraham Accords.", s: {
     '1880': { pop: 100 }, '1900': { pop: 400 }, '1914': { pop: 800 }, '1933': { pop: 1000 }, '1939': { pop: 1200 }, '1945': { pop: 1400 }, '1948': { pop: 1500 }, '1950': { pop: 500 }, '1970': { pop: 100 }, '1990': { pop: 40 }, '2010': { pop: 30 }, '2025': { pop: 80 } } },
   BR: { n: "Brazil", note: "First community in Recife under Dutch rule (1630–1654); modern community re-established from late 19th c. immigration.", s: {
     '1648': { pop: 600 }, '1700': { pop: 50 }, '1800': { pop: 200 }, '1850': { pop: 1500 }, '1880': { pop: 5000 }, '1900': { pop: 10000 }, '1914': { pop: 25000 }, '1933': { pop: 60000 }, '1939': { pop: 90000 }, '1945': { pop: 110000 }, '1948': { pop: 120000 }, '1950': { pop: 125000 }, '1970': { pop: 150000 }, '1990': { pop: 130000 }, '2010': { pop: 107000 }, '2025': { pop: 93000 } } },
@@ -161,19 +161,19 @@ window.JEWISH_DATA = {
     '1800': { pop: 100 }, '1850': { pop: 1000 }, '1880': { pop: 4000 }, '1900': { pop: 25000 }, '1914': { pop: 45000 }, '1933': { pop: 80000 }, '1939': { pop: 90000 }, '1945': { pop: 100000 }, '1948': { pop: 104000 }, '1950': { pop: 108000 }, '1970': { pop: 118000, share: 0.5 }, '1990': { pop: 107000 }, '2010': { pop: 70000 }, '2025': { pop: 50000 } } },
   ZW: { n: "Zimbabwe", note: "Community established Bulawayo 1894; peak ~7,500 in early 1970s; rapid emigration during Bush War (1965–80) and post-independence; under 200 remain today.", s: {
     '1900': { pop: 300 }, '1914': { pop: 800 }, '1933': { pop: 1800 }, '1939': { pop: 2000 }, '1945': { pop: 2100 }, '1948': { pop: 2500 }, '1950': { pop: 3500 }, '1970': { pop: 7200, share: 0.3 }, '1990': { pop: 2000 }, '2010': { pop: 400 }, '2025': { pop: 200 } } },
-  GI: { n: "Gibraltar", note: "One of the most prominent Jewish communities per capita outside Israel — Sephardi roots from the 1700s, four working synagogues; produced Chief Minister Sir Joshua Hassan.", s: {
+  GI: { n: "Gibraltar", lat: 36.14, lng: -5.35, note: "One of the most prominent Jewish communities per capita outside Israel — Sephardi roots from the 1700s, four working synagogues; produced Chief Minister Sir Joshua Hassan.", s: {
     '1750': { pop: 600, share: 12 }, '1800': { pop: 1600, share: 13 }, '1850': { pop: 1800, share: 10 }, '1900': { pop: 1800, share: 9 }, '1950': { pop: 1100, share: 4.5 }, '1970': { pop: 700, share: 2.6 }, '2025': { pop: 750, share: 2.3 } } },
-  MC: { n: "Monaco", note: "Small, affluent community formed in the 20th century; among the highest Jewish shares per capita outside Israel.", s: {
+  MC: { n: "Monaco", lat: 43.74, lng: 7.42, note: "Small, affluent community formed in the 20th century; among the highest Jewish shares per capita outside Israel.", s: {
     '1950': { pop: 300 }, '1970': { pop: 500, share: 1.6 }, '2025': { pop: 700, share: 1.8 } } },
   LU: { n: "Luxembourg", note: "Community dates to the Middle Ages; about half were deported in the Holocaust; ~1,500 today.", s: {
     '1900': { pop: 1200 }, '1933': { pop: 3900, share: 1.3 }, '1939': { pop: 4000, share: 1.3 }, '1945': { pop: 1500 }, '1970': { pop: 1000 }, '2025': { pop: 1500, share: 0.23 } } },
   PA: { n: "Panama", note: "One of Latin America's most observant communities relative to size — largely Sephardi; has had Jewish heads of state.", s: {
     '1920': { pop: 1000 }, '1950': { pop: 2000 }, '1970': { pop: 5000 }, '2025': { pop: 10000, share: 0.23 } } },
-  CW: { n: "Curaçao", note: "Mikvé Israel-Emanuel (1651; 1732 building) is the oldest synagogue in continuous use in the Americas — the 'Mother Community' that helped seed early US congregations.", s: {
+  CW: { n: "Curaçao", lat: 12.11, lng: -68.93, note: "Mikvé Israel-Emanuel (1651; 1732 building) is the oldest synagogue in continuous use in the Americas — the 'Mother Community' that helped seed early US congregations.", s: {
     '1700': { pop: 2000, share: 18 }, '1750': { pop: 2500, share: 15 }, '1800': { pop: 1100, share: 6 }, '1900': { pop: 700 }, '1950': { pop: 700 }, '1970': { pop: 700 }, '2025': { pop: 300, share: 0.19 } } },
   SR: { n: "Suriname", note: "Jodensavanne ('Jews' Savannah', founded 1600s) was a rare self-governing Jewish plantation settlement in the New World.", s: {
     '1700': { pop: 1500 }, '1800': { pop: 1300 }, '1900': { pop: 1000 }, '1950': { pop: 600 }, '1970': { pop: 500 }, '2025': { pop: 130, share: 0.02 } } },
-  BB: { n: "Barbados", note: "Nidhe Israel synagogue (1654) is among the oldest in the Americas; the community lapsed and was revived in the 20th century.", s: {
+  BB: { n: "Barbados", lat: 13.1, lng: -59.62, note: "Nidhe Israel synagogue (1654) is among the oldest in the Americas; the community lapsed and was revived in the 20th century.", s: {
     '1700': { pop: 800 }, '1800': { pop: 400 }, '1900': { pop: 30 }, '1970': { pop: 70 }, '2025': { pop: 50, share: 0.02 } } },
   JM: { n: "Jamaica", note: "Sephardi presence from the 1500s; Kingston's Shaare Shalom (1912) keeps a traditional sand-covered floor.", s: {
     '1700': { pop: 800 }, '1800': { pop: 2500 }, '1900': { pop: 2000 }, '1950': { pop: 1500 }, '2025': { pop: 200, share: 0.01 } } },
@@ -193,8 +193,8 @@ window.JEWISH_DATA = {
     '1900': { pop: 1000 }, '1939': { pop: 2000 }, '1945': { pop: 1800 }, '2025': { pop: 1300, share: 0.02 } } },
   EE: { n: "Estonia", note: "The Nazis declared Estonia 'judenfrei' in 1942 after murdering its ~1,000 remaining Jews; the community has since revived to ~2,000.", s: {
     '1933': { pop: 4500 }, '1939': { pop: 4000 }, '1945': { pop: 500 }, '1970': { pop: 4000 }, '2025': { pop: 2000, share: 0.15 } } },
-  SG: { n: "Singapore", note: "Baghdadi-Jewish roots from the 1830s; produced first Chief Minister David Marshall; ~2,500 today.", s: {
+  SG: { n: "Singapore", lat: 1.29, lng: 103.85, note: "Baghdadi-Jewish roots from the 1830s; produced first Chief Minister David Marshall; ~2,500 today.", s: {
     '1900': { pop: 600 }, '1939': { pop: 1500 }, '1950': { pop: 800 }, '2025': { pop: 2500, share: 0.04 } } },
-  HK: { n: "Hong Kong", note: "Baghdadi-Jewish merchant families (Sassoon, Kadoorie) shaped the city; the Ohel Leah synagogue dates to 1902; ~5,000 today.", s: {
+  HK: { n: "Hong Kong", lat: 22.32, lng: 114.17, note: "Baghdadi-Jewish merchant families (Sassoon, Kadoorie) shaped the city; the Ohel Leah synagogue dates to 1902; ~5,000 today.", s: {
     '1900': { pop: 200 }, '1950': { pop: 250 }, '1970': { pop: 800 }, '2025': { pop: 5000, share: 0.07 } } },
 };

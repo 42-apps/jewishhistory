@@ -67,6 +67,10 @@ function worldTotal(year) {
 const clamp01 = t => Math.max(0, Math.min(1, t));
 let _popEst = null;
 function popEstOf(iso) { if (!_popEst || _popEst.__n !== countries.length) { _popEst = { __n: countries.length }; for (const f of countries) { const i = isoOf(f.properties); if (i) _popEst[i] = (_popEst[i] || 0) + (Number(f.properties.POP_EST) || 0); } } return _popEst[iso] || 0; }
+let _geoIso = null;
+function geoIsoSet() { if (!_geoIso || _geoIso.__n !== countries.length) { _geoIso = new Set(); _geoIso.__n = countries.length; for (const f of countries) { const i = isoOf(f.properties); if (i) _geoIso.add(i); } } return _geoIso; }
+// Communities with no map polygon (microstates/territories) → rendered as dots at their lat/lng.
+function communityDots() { const set = geoIsoSet(), year = curYear(), out = []; for (const iso in DATA) { const rec = DATA[iso]; if (set.has(iso) || rec.lat == null) continue; const v = valAt(rec, year); if (v && v.pop > 0) out.push({ iso, lat: rec.lat, lng: rec.lng, __community: true }); } return out; }
 // Jewish % of a country's total population: the data's `share` if present, else estimate from Natural Earth POP_EST.
 function densityPct(iso, v) { if (v && v.share != null) return v.share; const pe = popEstOf(iso); return (v && pe > 0) ? Math.min(100, v.pop / pe * 100) : 0; }
 function fmtPct(p) { if (p == null) return '—'; if (p >= 10) return Math.round(p) + '%'; if (p >= 1) return p.toFixed(1) + '%'; if (p >= 0.01) return p.toFixed(2) + '%'; if (p > 0) return '<0.01%'; return '0%'; }
@@ -194,6 +198,15 @@ function refreshArcs() {
 
 /* event pins */
 function makePin(d) {
+  if (d.__community) {
+    const el = document.createElement('div');
+    const v = valAt(DATA[d.iso], curYear()), t = v ? metricT(v, curYear(), d.iso) : 0;
+    el.title = (DATA[d.iso] && DATA[d.iso].n) || d.iso;
+    el.style.cssText = 'width:9px;height:9px;border-radius:50%;cursor:pointer;background:' + (t == null ? '#7f8aa0' : rampColor(t)) + ';border:1.5px solid rgba(255,255,255,.6);box-shadow:0 0 0 1px rgba(6,12,24,.7), 0 0 6px rgba(120,180,255,.45)';
+    if (state.selected === d.iso) { el.style.width = el.style.height = '13px'; el.style.boxShadow = '0 0 0 2px #fff, 0 0 9px rgba(120,180,255,.8)'; }
+    el.addEventListener('click', ev => { ev.stopPropagation(); gotoCountry(d.iso); });
+    return el;
+  }
   const el = document.createElement('div');
   const col = catColor(d.cat);
   el.title = d.title + ' · ' + fmtYear(d.year);
@@ -208,11 +221,10 @@ function makePin(d) {
 }
 function refreshPins() {
   if (!globe) return;
-  if (!state.layers.events) { globe.htmlElementsData([]); return; }
   const [lo, hi] = activeBand(state.stepIdx);
-  const act = EVENTS.filter(e => evActive(e, lo, hi) && evVisible(e));
+  let act = state.layers.events ? EVENTS.filter(e => evActive(e, lo, hi) && evVisible(e)) : [];
   if (state.selectedEvent && EV_BY_ID[state.selectedEvent] && !act.includes(EV_BY_ID[state.selectedEvent])) act.push(EV_BY_ID[state.selectedEvent]);
-  globe.htmlElementsData(act);
+  globe.htmlElementsData(act.concat(communityDots()));   // community dots always shown (population markers for places with no polygon)
 }
 
 function showGlobeError() {
@@ -529,11 +541,12 @@ function updateFlatArcsPins() {
       return `<path class="flat-arc" d="M${x1.toFixed(0)},${y1.toFixed(0)} Q${mx.toFixed(0)},${my.toFixed(0)} ${x2.toFixed(0)},${y2.toFixed(0)}" stroke="rgba(${c},.9)" stroke-width="${(1 + (m.magnitude || 1) * 0.8).toFixed(1)}"${m.track === 'tradition' ? ' stroke-dasharray="8 6"' : ''}/>`;
     }).join('');
   } else arcG.innerHTML = '';
-  if (state.layers.events) {
-    pinG.innerHTML = EVENTS.filter(e => evActive(e, lo, hi) && evVisible(e)).map(e =>
-      `<g class="flat-pin" data-ev="${e.id}"><circle cx="${fpx(e.lng).toFixed(0)}" cy="${fpy(e.lat).toFixed(0)}" r="7" fill="${e.track === 'tradition' ? 'rgba(216,163,46,.25)' : catColor(e.cat)}" stroke="${e.track === 'tradition' ? TAXO.tracks.tradition.color : 'rgba(6,12,24,.8)'}" stroke-width="${e.track === 'tradition' ? 2 : 1}"/></g>`).join('');
-    pinG.querySelectorAll('.flat-pin').forEach(g => g.addEventListener('click', ev => { ev.stopPropagation(); selectEvent(g.dataset.ev, true); }));
-  } else pinG.innerHTML = '';
+  const evPins = state.layers.events ? EVENTS.filter(e => evActive(e, lo, hi) && evVisible(e)).map(e =>
+    `<g class="flat-pin" data-ev="${e.id}"><circle cx="${fpx(e.lng).toFixed(0)}" cy="${fpy(e.lat).toFixed(0)}" r="7" fill="${e.track === 'tradition' ? 'rgba(216,163,46,.25)' : catColor(e.cat)}" stroke="${e.track === 'tradition' ? TAXO.tracks.tradition.color : 'rgba(6,12,24,.8)'}" stroke-width="${e.track === 'tradition' ? 2 : 1}"/></g>`).join('') : '';
+  const comPins = communityDots().map(d => { const v = valAt(DATA[d.iso], curYear()), t = v ? metricT(v, curYear(), d.iso) : 0; return `<g class="flat-com" data-iso="${d.iso}"><circle cx="${fpx(d.lng).toFixed(0)}" cy="${fpy(d.lat).toFixed(0)}" r="6" fill="${t == null ? '#7f8aa0' : rgbaT(t, 0.95)}" stroke="rgba(255,255,255,.6)" stroke-width="1.5"/></g>`; }).join('');
+  pinG.innerHTML = evPins + comPins;
+  pinG.querySelectorAll('.flat-pin').forEach(g => g.addEventListener('click', ev => { ev.stopPropagation(); selectEvent(g.dataset.ev, true); }));
+  pinG.querySelectorAll('.flat-com').forEach(g => g.addEventListener('click', ev => { ev.stopPropagation(); gotoCountry(g.dataset.iso); }));
 }
 function syncFlatSelection() { if (flatBuilt) document.querySelectorAll('.flat-hit').forEach(el => el.classList.toggle('sel', el.dataset.iso === state.selected)); }
 function flatHover(iso, e) { if (flatDragging) return; state.hovered = iso; tooltip.innerHTML = tooltipHTML(iso, countries.find(c => isoOf(c.properties) === iso)); tooltip.classList.remove('hidden'); tooltip.style.left = e.clientX + 'px'; tooltip.style.top = e.clientY + 'px'; }
@@ -603,7 +616,7 @@ document.getElementById('flatTip').addEventListener('click', e => { if (e.target
 function gotoCountry(iso) {
   state.selectedEvent = null; eventCard.classList.add('hidden');
   const f = countries.find(c => isoOf(c.properties) === iso);
-  if (!f) { state.selected = iso; refreshGlobe(); showDetail(iso, null); return; }   // microstate/territory absent from the 1:110m polygons — show its card, no globe fly
+  if (!f) { state.selected = iso; refreshGlobe(); if (state.flat) { updateFlatArcsPins(); syncFlatSelection(); } else refreshPins(); showDetail(iso, null); return; }   // microstate/territory absent from the 1:110m polygons — highlight its dot, show its card, no globe fly
   if (state.flat) { state.selected = iso; showDetail(iso, f); syncFlatSelection(); const [lng, lat] = polyCentroid(f); flyFlatTo(lng, lat); }
   else onClick(f);
 }
