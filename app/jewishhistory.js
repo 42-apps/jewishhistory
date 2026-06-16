@@ -69,7 +69,7 @@ let _popEst = null;
 function popEstOf(iso) { if (!_popEst || _popEst.__n !== countries.length) { _popEst = { __n: countries.length }; for (const f of countries) { const i = isoOf(f.properties); if (i) _popEst[i] = (_popEst[i] || 0) + (Number(f.properties.POP_EST) || 0); } } return _popEst[iso] || 0; }
 // Jewish % of a country's total population: the data's `share` if present, else estimate from Natural Earth POP_EST.
 function densityPct(iso, v) { if (v && v.share != null) return v.share; const pe = popEstOf(iso); return (v && pe > 0) ? Math.min(100, v.pop / pe * 100) : 0; }
-function fmtPct(p) { if (p == null) return '—'; if (p >= 10) return Math.round(p) + '%'; if (p >= 1) return p.toFixed(1) + '%'; if (p > 0) return p.toFixed(2) + '%'; return '0%'; }
+function fmtPct(p) { if (p == null) return '—'; if (p >= 10) return Math.round(p) + '%'; if (p >= 1) return p.toFixed(1) + '%'; if (p >= 0.01) return p.toFixed(2) + '%'; if (p > 0) return '<0.01%'; return '0%'; }
 // Map a country's value to 0..1 intensity for the active metric.
 function metricT(v, year, iso) {
   if (!v || v.pop <= 0) return null;
@@ -601,8 +601,9 @@ document.getElementById('flatTip').addEventListener('click', e => { if (e.target
 
 /* ------------------------------- search + share ------------------------------- */
 function gotoCountry(iso) {
-  const f = countries.find(c => isoOf(c.properties) === iso); if (!f) return;
   state.selectedEvent = null; eventCard.classList.add('hidden');
+  const f = countries.find(c => isoOf(c.properties) === iso);
+  if (!f) { state.selected = iso; refreshGlobe(); showDetail(iso, null); return; }   // microstate/territory absent from the 1:110m polygons — show its card, no globe fly
   if (state.flat) { state.selected = iso; showDetail(iso, f); syncFlatSelection(); const [lng, lat] = polyCentroid(f); flyFlatTo(lng, lat); }
   else onClick(f);
 }

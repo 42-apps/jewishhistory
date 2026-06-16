@@ -161,4 +161,40 @@ window.JEWISH_DATA = {
     '1800': { pop: 100 }, '1850': { pop: 1000 }, '1880': { pop: 4000 }, '1900': { pop: 25000 }, '1914': { pop: 45000 }, '1933': { pop: 80000 }, '1939': { pop: 90000 }, '1945': { pop: 100000 }, '1948': { pop: 104000 }, '1950': { pop: 108000 }, '1970': { pop: 118000, share: 0.5 }, '1990': { pop: 107000 }, '2010': { pop: 70000 }, '2025': { pop: 50000 } } },
   ZW: { n: "Zimbabwe", note: "Community established Bulawayo 1894; peak ~7,500 in early 1970s; rapid emigration during Bush War (1965–80) and post-independence; under 200 remain today.", s: {
     '1900': { pop: 300 }, '1914': { pop: 800 }, '1933': { pop: 1800 }, '1939': { pop: 2000 }, '1945': { pop: 2100 }, '1948': { pop: 2500 }, '1950': { pop: 3500 }, '1970': { pop: 7200, share: 0.3 }, '1990': { pop: 2000 }, '2010': { pop: 400 }, '2025': { pop: 200 } } },
+  GI: { n: "Gibraltar", note: "One of the most prominent Jewish communities per capita outside Israel — Sephardi roots from the 1700s, four working synagogues; produced Chief Minister Sir Joshua Hassan.", s: {
+    '1750': { pop: 600, share: 12 }, '1800': { pop: 1600, share: 13 }, '1850': { pop: 1800, share: 10 }, '1900': { pop: 1800, share: 9 }, '1950': { pop: 1100, share: 4.5 }, '1970': { pop: 700, share: 2.6 }, '2025': { pop: 750, share: 2.3 } } },
+  MC: { n: "Monaco", note: "Small, affluent community formed in the 20th century; among the highest Jewish shares per capita outside Israel.", s: {
+    '1950': { pop: 300 }, '1970': { pop: 500, share: 1.6 }, '2025': { pop: 700, share: 1.8 } } },
+  LU: { n: "Luxembourg", note: "Community dates to the Middle Ages; about half were deported in the Holocaust; ~1,500 today.", s: {
+    '1900': { pop: 1200 }, '1933': { pop: 3900, share: 1.3 }, '1939': { pop: 4000, share: 1.3 }, '1945': { pop: 1500 }, '1970': { pop: 1000 }, '2025': { pop: 1500, share: 0.23 } } },
+  PA: { n: "Panama", note: "One of Latin America's most observant communities relative to size — largely Sephardi; has had Jewish heads of state.", s: {
+    '1920': { pop: 1000 }, '1950': { pop: 2000 }, '1970': { pop: 5000 }, '2025': { pop: 10000, share: 0.23 } } },
+  CW: { n: "Curaçao", note: "Mikvé Israel-Emanuel (1651; 1732 building) is the oldest synagogue in continuous use in the Americas — the 'Mother Community' that helped seed early US congregations.", s: {
+    '1700': { pop: 2000, share: 18 }, '1750': { pop: 2500, share: 15 }, '1800': { pop: 1100, share: 6 }, '1900': { pop: 700 }, '1950': { pop: 700 }, '1970': { pop: 700 }, '2025': { pop: 300, share: 0.19 } } },
+  SR: { n: "Suriname", note: "Jodensavanne ('Jews' Savannah', founded 1600s) was a rare self-governing Jewish plantation settlement in the New World.", s: {
+    '1700': { pop: 1500 }, '1800': { pop: 1300 }, '1900': { pop: 1000 }, '1950': { pop: 600 }, '1970': { pop: 500 }, '2025': { pop: 130, share: 0.02 } } },
+  BB: { n: "Barbados", note: "Nidhe Israel synagogue (1654) is among the oldest in the Americas; the community lapsed and was revived in the 20th century.", s: {
+    '1700': { pop: 800 }, '1800': { pop: 400 }, '1900': { pop: 30 }, '1970': { pop: 70 }, '2025': { pop: 50, share: 0.02 } } },
+  JM: { n: "Jamaica", note: "Sephardi presence from the 1500s; Kingston's Shaare Shalom (1912) keeps a traditional sand-covered floor.", s: {
+    '1700': { pop: 800 }, '1800': { pop: 2500 }, '1900': { pop: 2000 }, '1950': { pop: 1500 }, '2025': { pop: 200, share: 0.01 } } },
+  CU: { n: "Cuba", note: "Peaked around 15,000–24,000 before 1959; most emigrated after the revolution; a few hundred remain, mainly in Havana.", s: {
+    '1920': { pop: 5000 }, '1933': { pop: 8000 }, '1950': { pop: 15000 }, '1970': { pop: 1500 }, '2025': { pop: 500, share: 0.005 } } },
+  DO: { n: "Dominican Republic", note: "Sosúa took in ~700 Jewish refugees from Nazism (from 1940), when most of the world had closed its doors.", s: {
+    '1939': { pop: 100 }, '1945': { pop: 700 }, '1970': { pop: 350 }, '2025': { pop: 350, share: 0.003 } } },
+  CR: { n: "Costa Rica", note: "~3,000 Jews, many descended from immigrants from a single Polish town (Żelechów).", s: {
+    '1933': { pop: 500 }, '1950': { pop: 1500 }, '1970': { pop: 2000 }, '2025': { pop: 3000, share: 0.06 } } },
+  CO: { n: "Colombia", note: "Communities in Bogotá, Barranquilla and Cali; ~2,000 today after recent emigration.", s: {
+    '1933': { pop: 3000 }, '1950': { pop: 6000 }, '1970': { pop: 8000 }, '2025': { pop: 2000, share: 0.004 } } },
+  PE: { n: "Peru", note: "Lima community of Sephardi, German and Eastern-European origin; ~2,300 today.", s: {
+    '1933': { pop: 2000 }, '1950': { pop: 4000 }, '1970': { pop: 5000 }, '2025': { pop: 2300, share: 0.007 } } },
+  IE: { n: "Ireland", note: "Dublin's community produced figures such as Chaim Herzog, later President of Israel; ~2,700 today.", s: {
+    '1900': { pop: 4000 }, '1945': { pop: 5000 }, '1970': { pop: 4000 }, '2025': { pop: 2700, share: 0.05 } } },
+  FI: { n: "Finland", note: "Rooted in 19th-century Russian-army 'Cantonist' soldiers; its Jews were protected even as Finland co-belligered with Germany in WWII.", s: {
+    '1900': { pop: 1000 }, '1939': { pop: 2000 }, '1945': { pop: 1800 }, '2025': { pop: 1300, share: 0.02 } } },
+  EE: { n: "Estonia", note: "The Nazis declared Estonia 'judenfrei' in 1942 after murdering its ~1,000 remaining Jews; the community has since revived to ~2,000.", s: {
+    '1933': { pop: 4500 }, '1939': { pop: 4000 }, '1945': { pop: 500 }, '1970': { pop: 4000 }, '2025': { pop: 2000, share: 0.15 } } },
+  SG: { n: "Singapore", note: "Baghdadi-Jewish roots from the 1830s; produced first Chief Minister David Marshall; ~2,500 today.", s: {
+    '1900': { pop: 600 }, '1939': { pop: 1500 }, '1950': { pop: 800 }, '2025': { pop: 2500, share: 0.04 } } },
+  HK: { n: "Hong Kong", note: "Baghdadi-Jewish merchant families (Sassoon, Kadoorie) shaped the city; the Ohel Leah synagogue dates to 1902; ~5,000 today.", s: {
+    '1900': { pop: 200 }, '1950': { pop: 250 }, '1970': { pop: 800 }, '2025': { pop: 5000, share: 0.07 } } },
 };
