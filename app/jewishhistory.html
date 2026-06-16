@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Jewish History Explorer</title>
-<link rel="stylesheet" href="jewishhistory.css?v=7">
+<link rel="stylesheet" href="jewishhistory.css?v=9">
 </head>
 <body>
   <!-- ===== Header ===== -->
@@ -35,6 +35,7 @@
         <button class="mi" id="miFull"><span class="mi-ic">⛶</span><span class="mi-tx">Fullscreen</span></button>
         <div class="mi-sep"></div>
         <button class="mi" id="miTrend"><span class="mi-ic">📈</span><span class="mi-tx">World Jewry over time</span></button>
+        <button class="mi" id="miDecline"><span class="mi-ic">📉</span><span class="mi-tx">Greatest declines</span></button>
         <button class="mi" id="miHelp"><span class="mi-ic">?</span><span class="mi-tx">How to use</span></button>
         <button class="mi" id="miAbout"><span class="mi-ic">ℹ</span><span class="mi-tx">About &amp; sources</span></button>
       </div>
@@ -211,10 +212,21 @@
     </div>
   </div>
 
+  <!-- ===== Greatest declines ===== -->
+  <div id="declineOverlay" class="hidden">
+    <div class="trend-box">
+      <button id="declineClose" class="about-close" title="Close">×</button>
+      <h2>Greatest declines — where communities collapsed</h2>
+      <p class="trend-sub">The steepest fall in each country's Jewish population, and when it happened. Click a row to jump to that moment on the map.</p>
+      <div id="declineTable"></div>
+      <p class="wt-cav">Ranked by the largest drop between two eras, for communities that once numbered 15,000+. Figures are approximate scholarly estimates; the cause shown is the dominant factor for that period.</p>
+    </div>
+  </div>
+
   <script src="lib/globe.gl.min.js"></script>
   <script src="lib/polygon-clipping.js"></script>
-  <script src="data/timeline.js?v=7"></script>
-  <script src="data/jewish-data.js?v=7"></script>
-  <script src="jewishhistory.js?v=7"></script>
+  <script src="data/timeline.js?v=9"></script>
+  <script src="data/jewish-data.js?v=9"></script>
+  <script src="jewishhistory.js?v=9"></script>
 </body>
 </html>

@@ -665,9 +665,56 @@ document.getElementById('trendClose').addEventListener('click', () => document.g
 document.getElementById('trendOverlay').addEventListener('click', e => { if (e.target.id === 'trendOverlay') document.getElementById('trendOverlay').classList.add('hidden'); });
 document.getElementById('wtChart').addEventListener('click', e => { const svg = e.currentTarget.querySelector('svg'); if (!svg) return; const r = svg.getBoundingClientRect(); if (!r.width) return; const i = Math.round(((e.clientX - r.left) / r.width) * (N - 1)); gotoStep(Math.max(0, Math.min(N - 1, i))); showWorldTrend(); });
 
+/* ------------------------------- greatest declines ------------------------------- */
+// Per country, the steepest fall between two adjacent eras (from a base of 15,000+) — isolates the event.
+function computeDeclines() {
+  const out = [];
+  for (const iso in DATA) {
+    const rec = DATA[iso]; if (!rec.s) continue;
+    const av = Object.keys(rec.s).map(id => ({ y: yr(id), p: rec.s[id].pop || 0 })).sort((a, b) => a.y - b.y);
+    let best = null;
+    for (let i = 0; i < av.length - 1; i++) {
+      const A = av[i], B = av[i + 1];
+      if (A.p < 15000 || B.p >= A.p) continue;
+      const dropPct = (A.p - B.p) / A.p * 100;
+      if (!best || dropPct > best.dropPct) best = { iso, n: rec.n, fromYear: A.y, toYear: B.y, fromPop: A.p, toPop: B.p, dropPct };
+    }
+    if (best && best.dropPct >= 40) out.push(best);
+  }
+  return out.sort((a, b) => b.dropPct - a.dropPct || (b.fromPop - b.toPop) - (a.fromPop - a.toPop));
+}
+function declineCause(d) {
+  const t = d.toYear;
+  if (t >= 1938 && t <= 1945) return 'the Holocaust';
+  if (t > 1945 && t <= 1980) return 'emigration to Israel';
+  if (t > 1980 && t <= 2010) return 'mass emigration';
+  if (t >= 1480 && t <= 1500) return 'expulsion';
+  if (t === 1391) return 'pogroms & conversion';
+  if (t >= 1280 && t < 1300) return 'expulsion';
+  if (t >= 1640 && t <= 1670) return 'the Khmelnytsky massacres';
+  if (t >= 1850 && t <= 1925) return 'pogroms & emigration';
+  if (t <= 300) return 'Roman-era wars';
+  return 'decline';
+}
+function showDecline() {
+  const rows = computeDeclines();
+  document.getElementById('declineTable').innerHTML = rows.map((d, i) => {
+    const w = Math.max(3, Math.min(100, d.dropPct));
+    return `<div class="dec-row" data-iso="${d.iso}" data-year="${d.fromYear}"><span class="dec-rank">${i + 1}</span>` +
+      `<div><div class="dec-name">${nameOf(d.iso)}<span class="dec-cause">${declineCause(d)}</span></div>` +
+      `<div class="dec-flow">${fmtPop(d.fromPop)} (${fmtYear(d.fromYear)}) &rarr; ${fmtPop(d.toPop)} (${fmtYear(d.toYear)})</div></div>` +
+      `<div class="dec-right"><div class="dec-pct">&minus;${Math.round(d.dropPct)}%</div><div class="dec-bar"><span style="width:${w}%"></span></div></div></div>`;
+  }).join('');
+  document.getElementById('declineOverlay').classList.remove('hidden');
+}
+document.getElementById('miDecline').addEventListener('click', () => { closeMenu(); showDecline(); });
+document.getElementById('declineClose').addEventListener('click', () => document.getElementById('declineOverlay').classList.add('hidden'));
+document.getElementById('declineOverlay').addEventListener('click', e => { if (e.target.id === 'declineOverlay') document.getElementById('declineOverlay').classList.add('hidden'); });
+document.getElementById('declineTable').addEventListener('click', e => { const r = e.target.closest('.dec-row'); if (!r) return; document.getElementById('declineOverlay').classList.add('hidden'); gotoStep(nearestStep(+r.dataset.year)); gotoCountry(r.dataset.iso); });
+
 /* ------------------------------- keyboard ------------------------------- */
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') { closeMenu(); closeTutorial(); closeFlatTip(); aboutOverlay.classList.add('hidden'); document.getElementById('trendOverlay').classList.add('hidden'); if (!eventCard.classList.contains('hidden') || !detailCard.classList.contains('hidden')) closeDetailAll(); }
+  if (e.key === 'Escape') { closeMenu(); closeTutorial(); closeFlatTip(); aboutOverlay.classList.add('hidden'); document.getElementById('trendOverlay').classList.add('hidden'); document.getElementById('declineOverlay').classList.add('hidden'); if (!eventCard.classList.contains('hidden') || !detailCard.classList.contains('hidden')) closeDetailAll(); }
   else if (e.target && e.target.tagName === 'INPUT') return;
   else if (e.key === 'ArrowRight') gotoStep(Math.min(N - 1, state.stepIdx + 1));
   else if (e.key === 'ArrowLeft') gotoStep(Math.max(0, state.stepIdx - 1));
